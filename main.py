@@ -1,6 +1,7 @@
 """
-License: Apache
-Organization: UNIR
+Licencia: Apache
+Organización: UNIR
+Descripción: Este script lee una lista de palabras desde un archivo, opcionalmente elimina duplicados, y las ordena.
 """
 
 import os
@@ -10,40 +11,51 @@ DEFAULT_FILENAME = "words.txt"
 DEFAULT_DUPLICATES = False
 
 
-def sort_list(items, ascending=True):
+def ordenar_lista(items, ascendente=True):
+
     if not isinstance(items, list):
-        raise RuntimeError(f"No puede ordenar {type(items)}")
+        raise TypeError(f"No se puede ordenar un objeto de tipo {type(items)}. Se requiere una lista.")
 
-    return sorted(items, reverse=(not ascending))
+    return sorted(items, reverse=not ascendente)
 
 
-def remove_duplicates_from_list(items):
+def eliminar_duplicados_de_lista(items):
+
     return list(set(items))
 
 
-if __name__ == "__main__":
+def leer_palabras_desde_archivo(filename):
+    if not os.path.isfile(filename):
+        print(f"El archivo '{filename}' no se encontró. Usando la lista de palabras predeterminada.")
+        return ["ravenclaw", "gryffindor", "slytherin", "hufflepuff"]
+
+    with open(filename, "r") as file:
+        return [line.strip() for line in file if line.strip()]
+
+
+def main():
     filename = DEFAULT_FILENAME
-    remove_duplicates = DEFAULT_DUPLICATES
+    eliminar_duplicados = DEFAULT_DUPLICATES
+
     if len(sys.argv) == 3:
         filename = sys.argv[1]
-        remove_duplicates = sys.argv[2].lower() == "yes"
+        eliminar_duplicados = sys.argv[2].strip().lower() == "yes"
     else:
-        print("Se debe indicar el fichero como primer argumento")
-        print("El segundo argumento indica si se quieren eliminar duplicados")
+        print("Uso: python script.py <nombre_archivo> <eliminar_duplicados>")
+        print("  <nombre_archivo>: Nombre del archivo que contiene las palabras.")
+        print("  <eliminar_duplicados>: 'yes' para eliminar duplicados, 'no' en caso contrario.")
         sys.exit(1)
 
-    print(f"Se leerán las palabras del fichero {filename}")
-    file_path = os.path.join(".", filename)
-    if os.path.isfile(file_path):
-        word_list = []
-        with open(file_path, "r") as file:
-            for line in file:
-                word_list.append(line.strip())
-    else:
-        print(f"El fichero {filename} no existe")
-        word_list = ["ravenclaw", "gryffindor", "slytherin", "hufflepuff"]
+    print(f"Leyendo palabras del archivo: '{filename}'")
+    lista_palabras = leer_palabras_desde_archivo(filename)
 
-    if remove_duplicates:
-        word_list = remove_duplicates_from_list(word_list)
+    if eliminar_duplicados:
+        print("Eliminando duplicados...")
+        lista_palabras = eliminar_duplicados_de_lista(lista_palabras)
 
-    print(sort_list(word_list))
+    palabras_ordenadas = ordenar_lista(lista_palabras)
+    print("Palabras ordenadas:", palabras_ordenadas)
+
+
+if __name__ == "__main__":
+    main()
